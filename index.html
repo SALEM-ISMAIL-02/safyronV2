@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safyron Engineering | Process Safety & Fire Protection</title>
+    <meta name="description" content="Safyron Engineering delivers industrial risk analysis, hazard studies, and fire protection design for complex energy facilities — rendered as a real-time 3D experience.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body>
+    <canvas id="scene3d" aria-hidden="true"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <div class="loader" id="loader" role="status" aria-live="polite">
+        <div class="loader-inner">
+            <img src="logo.png" alt="Safyron Engineering">
+            <div class="loader-bar"><span id="loaderBar"></span></div>
+            <p class="loader-text" id="loaderText">Initializing protection grid</p>
+        </div>
+    </div>
+    <header class="site-header" id="siteHeader">
+        <div class="site-header-inner">
+            <a class="brand" href="#top" aria-label="Safyron Engineering home">
+                <img src="logo.png" alt="Safyron Engineering logo">
+            </a>
+
+            <button
+                class="nav-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls="mainNav"
+                aria-label="Open navigation menu"
+            >
+                <span class="nav-toggle-box" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </span>
+            </button>
+
+            <nav class="nav" id="mainNav" aria-label="Main navigation">
+                <a href="#act-network">Services</a>
+                <a href="#act-command">About</a>
+                <a href="#act-incident">Proof</a>
+                <a href="#act-resolution">Contact</a>
+                <a class="nav-cta" href="#act-resolution">Book a Discovery Call</a>
+            </nav>
+        </div>
+    </header>
+
+    <aside class="hud" aria-hidden="true">
+        <div class="hud-rail" id="hudRail">
+            <span class="hud-dot" data-dot><i></i><em>Overview</em></span>
+            <span class="hud-dot" data-dot><i></i><em>Service Network</em></span>
+            <span class="hud-dot" data-dot><i></i><em>Command</em></span>
+            <span class="hud-dot" data-dot><i></i><em>Incident</em></span>
+            <span class="hud-dot" data-dot><i></i><em>Suppression</em></span>
+            <span class="hud-dot" data-dot><i></i><em>Resolution</em></span>
+        </div>
+    </aside>
+    <div class="hud-readout" aria-hidden="true">
+        <span class="hud-readout-index" id="hudIndex">01 / 06</span>
+        <span class="hud-readout-title" id="hudTitle">Overview</span>
+    </div>
+
+    <main id="top">
+        <section class="act act-hero" id="act-hero" data-act="hero">
+            <div class="act-sticky">
+                <div class="caption caption-hero is-active">
+                    <span class="eyebrow">Process Safety for Critical Facilities</span>
+                    <h1>Engineering <span class="gradient">fire-safe industrial systems</span> in real time</h1>
+                    <p>Safyron Engineering shapes risk-driven protection for oil, gas and energy facilities. Scroll to run the line — from water reserve to deluge — and watch a full suppression sequence unfold in 3D.</p>
+                    <div class="hero-actions">
+                        <a class="btn-primary" href="#act-network">Explore Services</a>
+                        <a class="btn-secondary" href="#act-resolution">Book a Call</a>
+                    </div>
+                    <div class="hero-meta">
+                        <div class="meta-chip">Water reserve to pump line</div>
+                        <div class="meta-chip">Detection to deluge valve</div>
+                        <div class="meta-chip">Engineered dossiers</div>
+                    </div>
+                </div>
+                <div class="scroll-hint" aria-hidden="true"><span class="scroll-hint-line"></span><span class="scroll-hint-text">Scroll to run the line</span></div>
+            </div>
+        </section>
+
+        <section class="act act-network" id="act-network" data-act="network">
+            <div class="act-sticky">
+                <header class="network-head caption">
+                    <span class="section-kicker">Service Line</span>
+                    <h2>Follow the line — every module is a station on this network</h2>
+                </header>
+                <ol class="network-steps" id="networkSteps">
+                    <li class="step"><span class="step-index">Module 01</span><h3>Études de dangers</h3><p>Hazard studies that map every credible scenario on your facility before it can ever happen.</p></li>
+                    <li class="step"><span class="step-index">Module 02</span><h3>Analyses de risques industriels</h3><p>Industrial risk analysis ranking scenarios by likelihood and severity, so investment lands where exposure is highest.</p></li>
+                    <li class="step"><span class="step-index">Module 03</span><h3>Dimensionnement des systèmes incendie</h3><p>Fire protection sizing — water reserves, pump capacity and deluge networks computed line by line.</p></li>
+                    <li class="step"><span class="step-index">Module 04</span><h3>Notes de calcul</h3><p>Clean calculation notes your inspectors and insurers can follow, assumption by assumption.</p></li>
+                    <li class="step"><span class="step-index">Module 05</span><h3>Dossiers techniques</h3><p>Structured technical dossiers that turn engineering intent into approvable documentation.</p></li>
+                    <li class="step"><span class="step-index">Module 06</span><h3>Extension layer</h3><p>Reserved for HAZOP, ATEX and on-site follow-up modules as your asset grows.</p></li>
+                </ol>
+                <div class="network-progress" aria-hidden="true"><span id="networkProgressBar"></span></div>
+            </div>
+        </section>
+
+        <section class="act act-command" id="act-command" data-act="command">
+            <div class="act-sticky">
+                <div class="caption caption-command">
+                    <span class="section-kicker">Command Layer</span>
+                    <h2>A sharp industrial identity built around reliability, rigor and controlled response</h2>
+                    <p>Safyron Engineering designs the nervous system of industrial protection: detection grids, pump logic and deluge orchestration, engineered as one coherent whole.</p>
+                    <div class="about-meta">
+                        <div><span>CEO</span><strong>Ashref AMMAR</strong></div>
+                        <div><span>Role</span><strong>Process Safety Expert</strong></div>
+                        <div><span>Languages</span><strong>EN / FR / AR</strong></div>
+                        <div><span>Positioning</span><strong>Oil, energy, industrial assets</strong></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="act act-incident" id="act-incident" data-act="incident">
+            <div class="act-sticky">
+                <div class="caption caption-incident">
+                    <span class="section-kicker alert-kicker">Alarm State</span>
+                    <h2>When prevention ends, response begins</h2>
+                    <p>A pool fire ignites at the tank bund. Every module on the network is already in position — this is the moment the design proves itself.</p>
+                    <div class="response-record">
+                        <div class="metric"><strong>15:00</strong><span>Detection-to-deluge sequence demonstrated on this page</span></div>
+                        <div class="metric"><strong>06</strong><span>Modules running on one integrated protection network</span></div>
+                        <div class="metric"><strong>24/7</strong><span>Command coverage designed for critical facilities</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="act act-suppression" id="act-suppression" data-act="suppression">
+            <div class="act-sticky">
+                <div class="caption caption-suppression">
+                    <span class="section-kicker calm-kicker">Deluge Sequence</span>
+                    <h2>Water finds the fire</h2>
+                    <ul class="seq-list">
+                        <li data-seq="0"><span class="seq-dot"></span>Monitor array — OPEN</li>
+                        <li data-seq="1"><span class="seq-dot"></span>Foam blanket — FORMING</li>
+                        <li data-seq="2"><span class="seq-dot"></span>Asset — PROTECTED</li>
+                    </ul>
+                    <p class="seq-note">Keep scrolling: the fire dies exactly when the design says it should.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="act act-resolution" id="act-resolution" data-act="resolution">
+            <div class="act-sticky">
+                <div class="caption caption-resolution">
+                    <span class="section-kicker">Call To Action</span>
+                    <h2>Build the next layer of industrial safety with Safyron</h2>
+                    <div class="contact-stack">
+                        <div class="contact-chip"><strong>Phone</strong><span>+216 58 405 906</span></div>
+                        <div class="contact-chip"><strong>Email</strong><a href="mailto:ashref.ammar@gmail.com">ashref.ammar@gmail.com</a></div>
+                        <div class="contact-chip"><strong>LinkedIn</strong><a href="https://www.linkedin.com/in/ashraf-ammar-tn/" target="_blank" rel="noreferrer">Ashraf AMMAR</a></div>
+                    </div>
+                    <form class="newsletter-form" id="newsletterForm">
+                        <input type="email" id="newsletterEmail" placeholder="Enter your professional email" aria-label="Email address">
+                        <button type="submit">Request Updates</button>
+                    </form>
+                    <div class="newsletter-note" id="newsletterNote">No backend connected yet. This is a polished front-end placeholder.</div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-copy">
+                <p><strong>Safyron Engineering</strong></p>
+                <p>Real-time 3D concept website for process safety, industrial risk studies, and fire protection design.</p>
+            </div>
+            <div class="footer-links">
+                <a href="#act-network">Services</a>
+                <a href="#act-command">About</a>
+                <a href="#act-incident">Proof</a>
+                <a href="#act-resolution">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- 2D fallback experience: displayed only when WebGL is unavailable (body.no-webgl) -->
+    <aside class="legacy-2d" aria-hidden="true">
+        <svg class="pipeline-svg" viewBox="0 0 200 900" fill="none">
+            <defs>
+                <linearGradient id="pipeFlowGradient" x1="38" y1="0" x2="152" y2="900" gradientUnits="userSpaceOnUse">
+                    <stop offset="0%" stop-color="#d8f4ff"></stop>
+                    <stop offset="40%" stop-color="#7ccfff"></stop>
+                    <stop offset="75%" stop-color="#4faeff"></stop>
+                    <stop offset="100%" stop-color="#1f76d2"></stop>
+                </linearGradient>
+            </defs>
+            <path class="pipe-outline" d="M102 18 C154 58, 154 128, 112 178 C76 220, 74 270, 120 320 C160 366, 164 430, 110 490 C76 530, 74 598, 124 650 C164 692, 164 770, 108 848"></path>
+            <path class="pipe-core" d="M102 18 C154 58, 154 128, 112 178 C76 220, 74 270, 120 320 C160 366, 164 430, 110 490 C76 530, 74 598, 124 650 C164 692, 164 770, 108 848"></path>
+            <path id="pipeFlow" class="pipe-flow" d="M102 18 C154 58, 154 128, 112 178 C76 220, 74 270, 120 320 C160 366, 164 430, 110 490 C76 530, 74 598, 124 650 C164 692, 164 770, 108 848"></path>
+            <circle class="pipeline-node" cx="112" cy="178" r="14"></circle>
+            <circle class="pipeline-node" cx="120" cy="320" r="14"></circle>
+            <circle class="pipeline-node" cx="110" cy="490" r="14"></circle>
+            <circle class="pipeline-node" cx="124" cy="650" r="14"></circle>
+            <text class="pipeline-text" x="16" y="172">Reserve</text>
+            <text class="pipeline-text" x="22" y="314">Pumps</text>
+            <text class="pipeline-text" x="10" y="484">Detection</text>
+            <text class="pipeline-text" x="18" y="644">Deluge</text>
+            <text class="pipeline-text" x="26" y="842">Asset</text>
+        </svg>
+        <div class="sprinkler-zone">
+            <div class="sprinkler-head" id="sprinklerHead">
+                <div class="spray"></div>
+            </div>
+            <div class="fire-scene" id="fireScene">
+                <div class="flame flame-a"></div>
+                <div class="flame flame-b"></div>
+                <div class="flame flame-c"></div>
+                <div class="fire-base"></div>
+                <div class="steam steam-a"></div>
+                <div class="steam steam-b"></div>
+                <div class="steam steam-c"></div>
+            </div>
+        </div>
+    </aside>
+
+    <script src="script.js" defer></script>
+    <script type="module" src="scene3d.js"></script>
+</body>
+</html>
