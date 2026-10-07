@@ -1,11 +1,73 @@
-/* Safyron Engineering — UI layer: nav, captions, HUD, loader, newsletter, 2D fallback */
+/* Safyron Engineering — UI layer: navigation, captions, HUD, loader, and fallback */
 (function () {
     'use strict';
 
-    var body = document.body;
     var siteHeader = document.querySelector('.site-header');
     var navToggle = document.querySelector('.nav-toggle');
-    var navLinks = document.querySelectorAll('.nav a');
+    var navLinks = document.querySelectorAll('#mainNav a, #mainNav button');
+    var languageButtons = document.querySelectorAll('[data-language]');
+    var MOBILE_NAV_BREAKPOINT = 960;
+
+    /* ---------- language (English / French) ---------- */
+    var LANGUAGE_KEY = 'safyron-language';
+    var currentLanguage = 'en';
+    try {
+        currentLanguage = localStorage.getItem(LANGUAGE_KEY) === 'fr' ? 'fr' : 'en';
+    } catch (e) {
+        currentLanguage = 'en';
+    }
+
+    function applyLanguage(language, persist) {
+        currentLanguage = language === 'fr' ? 'fr' : 'en';
+        document.documentElement.lang = currentLanguage;
+        document.querySelectorAll('[data-en][data-fr]').forEach(function (element) {
+            element.textContent = element.getAttribute('data-' + currentLanguage);
+        });
+        document.querySelectorAll('[data-en-placeholder][data-fr-placeholder]').forEach(function (element) {
+            element.setAttribute('placeholder', element.getAttribute('data-' + currentLanguage + '-placeholder'));
+        });
+        languageButtons.forEach(function (button) {
+            var selected = button.getAttribute('data-language') === currentLanguage;
+            button.setAttribute('aria-pressed', String(selected));
+        });
+        var languageGroup = document.querySelector('.language-toggle');
+        if (languageGroup) {
+            languageGroup.setAttribute('aria-label', currentLanguage === 'fr' ? 'Choisir la langue' : 'Choose language');
+        }
+        document.title = currentLanguage === 'fr'
+            ? 'Safyron Engineering | Sécurité des procédés et protection incendie'
+            : 'Safyron Engineering | Process Safety & Fire Protection';
+        var bookingClose = document.querySelector('.booking-close');
+        if (bookingClose) {
+            var closeLabel = bookingClose.getAttribute('data-' + currentLanguage + '-label');
+            bookingClose.setAttribute('aria-label', closeLabel);
+            bookingClose.setAttribute('title', closeLabel);
+        }
+        if (themeToggle) {
+            var themeLabel = currentLanguage === 'fr'
+                ? (currentTheme() === 'dark' ? 'Passer en mode clair' : 'Passer en mode sombre')
+                : (currentTheme() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+            themeToggle.setAttribute('aria-label', themeLabel);
+            themeToggle.setAttribute('title', themeLabel);
+        }
+        if (navToggle) {
+            var navIsOpen = navToggle.getAttribute('aria-expanded') === 'true';
+            navToggle.setAttribute('aria-label', currentLanguage === 'fr'
+                ? (navIsOpen ? 'Fermer le menu' : 'Ouvrir le menu')
+                : (navIsOpen ? 'Close navigation menu' : 'Open navigation menu'));
+        }
+        if (persist) {
+            try { localStorage.setItem(LANGUAGE_KEY, currentLanguage); } catch (e) { /* private mode */ }
+        }
+        window.dispatchEvent(new CustomEvent('safyron:language', { detail: { language: currentLanguage } }));
+    }
+
+    languageButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            applyLanguage(button.getAttribute('data-language'), true);
+        });
+    });
+    applyLanguage(currentLanguage, false);
 
     /* ---------- theme (dark / light) ----------
        The <html data-theme> attribute is the single source of truth; CSS does all
@@ -24,7 +86,9 @@
         if (!themeToggle) return;
         var toLight = theme === 'dark';
         themeToggle.setAttribute('aria-pressed', String(theme === 'light'));
-        var label = toLight ? 'Switch to light mode' : 'Switch to dark mode';
+        var label = currentLanguage === 'fr'
+            ? (toLight ? 'Passer en mode clair' : 'Passer en mode sombre')
+            : (toLight ? 'Switch to light mode' : 'Switch to dark mode');
         themeToggle.setAttribute('aria-label', label);
         themeToggle.setAttribute('title', label);
     }
@@ -64,19 +128,21 @@
     function setMobileNavState(isOpen) {
         siteHeader.classList.toggle('nav-open', isOpen);
         navToggle.setAttribute('aria-expanded', String(isOpen));
-        navToggle.setAttribute('aria-label', isOpen ? 'Close navigation menu' : 'Open navigation menu');
+        navToggle.setAttribute('aria-label', currentLanguage === 'fr'
+            ? (isOpen ? 'Fermer le menu' : 'Ouvrir le menu')
+            : (isOpen ? 'Close navigation menu' : 'Open navigation menu'));
     }
     navToggle.addEventListener('click', function () {
         setMobileNavState(navToggle.getAttribute('aria-expanded') !== 'true');
     });
     navLinks.forEach(function (link) {
         link.addEventListener('click', function () {
-            if (window.innerWidth <= 860) setMobileNavState(false);
+            if (window.innerWidth <= MOBILE_NAV_BREAKPOINT) setMobileNavState(false);
         });
     });
     document.addEventListener('click', function (event) {
         if (
-            window.innerWidth <= 860 &&
+            window.innerWidth <= MOBILE_NAV_BREAKPOINT &&
             siteHeader.classList.contains('nav-open') &&
             !siteHeader.contains(event.target)
         ) setMobileNavState(false);
@@ -85,29 +151,26 @@
         if (event.key === 'Escape') setMobileNavState(false);
     });
     window.addEventListener('resize', function () {
-        if (window.innerWidth > 860) setMobileNavState(false);
+        if (window.innerWidth > MOBILE_NAV_BREAKPOINT) setMobileNavState(false);
     });
 
-    /* ---------- caption reveal per act (reversible, follows the 3D timeline) ---------- */
-    var acts = document.querySelectorAll('.act');
-    var captionObserver = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-            var caption = entry.target.querySelector('.caption');
-            if (caption) caption.classList.toggle('is-active', entry.isIntersecting);
-        });
-    }, { threshold: 0.28 });
-    acts.forEach(function (act) { captionObserver.observe(act); });
-
     /* ---------- HUD ---------- */
-    var ACT_TITLES = ['Overview', 'Service Network', 'Command', 'Incident', 'Suppression', 'Resolution'];
+    var ACT_TITLES = {
+        en: ['Overview', 'Detection & control', 'Valve & foam', 'Tank response', 'Fire pumps', 'All clear'],
+        fr: ['Vue d’ensemble', 'Détection & commande', 'Vannes & mousse', 'Protection des bacs', 'Pompes incendie', 'Fin d’intervention']
+    };
     var hudDots = document.querySelectorAll('#hudRail .hud-dot');
     var hudIndex = document.getElementById('hudIndex');
     var hudTitle = document.getElementById('hudTitle');
+    var activeActIndex = 0;
     window.addEventListener('safyron:act', function (e) {
-        var i = e.detail.index;
-        hudDots.forEach(function (dot, k) { dot.classList.toggle('is-active', k === i); });
-        hudIndex.textContent = String(i + 1).padStart(2, '0') + ' / 06';
-        hudTitle.textContent = ACT_TITLES[i] || '';
+        activeActIndex = e.detail.index;
+        hudDots.forEach(function (dot, k) { dot.classList.toggle('is-active', k === activeActIndex); });
+        hudIndex.textContent = String(activeActIndex + 1).padStart(2, '0') + ' / 06';
+        hudTitle.textContent = ACT_TITLES[currentLanguage][activeActIndex] || '';
+    });
+    window.addEventListener('safyron:language', function () {
+        hudTitle.textContent = ACT_TITLES[currentLanguage][activeActIndex] || '';
     });
 
     /* ---------- network service steps ---------- */
@@ -123,51 +186,6 @@
     });
     if (steps.length) { currentStep = 0; steps[0].classList.add('is-active'); }
 
-    /* ---------- 9-step dike-fire sequence + live telemetry ---------- */
-    var seqItems = document.querySelectorAll('#seqList li');
-    window.addEventListener('safyron:step', function (e) {
-        var i = e.detail.index;
-        seqItems.forEach(function (li, k) {
-            li.classList.toggle('is-active', k === i);
-            li.classList.toggle('is-done', k < i);
-        });
-    });
-
-    var telPressure = document.getElementById('telPressure');
-    var telPressureBar = document.getElementById('telPressureBar');
-    var telFoam = document.getElementById('telFoam');
-    var telCoolA = document.getElementById('telCoolA');
-    var telCoolB = document.getElementById('telCoolB');
-    var telTotal = document.getElementById('telTotal');
-    var telSolution = document.getElementById('telSolution');
-    var telConc = document.getElementById('telConc');
-    var telPump = document.getElementById('telPump');
-    var telValve = document.getElementById('telValve');
-    var telemetry = document.getElementById('telemetry');
-
-    function fmt(v, d) { return v.toFixed(d === undefined ? 0 : d); }
-
-    window.addEventListener('safyron:tel', function (e) {
-        var d = e.detail;
-        if (!telPressure) return;
-        telemetry.classList.toggle('is-live', d.active);
-        telPressure.textContent = fmt(d.pressure, 1) + ' bar';
-        // bar fills against the 10 bar static, 7 bar trip marked on the scale
-        telPressureBar.style.width = Math.max(0, Math.min(100, (d.pressure / 10) * 100)) + '%';
-        telPressureBar.classList.toggle('is-low', d.pressure < 7.6);
-        telFoam.textContent = fmt(d.foam) + ' L/min';
-        telCoolA.textContent = fmt(d.coolA) + ' L/min';
-        telCoolB.textContent = fmt(d.coolB) + ' L/min';
-        telTotal.textContent = fmt(d.total, 1) + ' m³/h';
-        telSolution.textContent = fmt(d.solution / 1000, 1) + ' m³';
-        telConc.textContent = fmt(d.concentrate) + ' L';
-
-        telPump.textContent = d.pump > 0.5 ? 'PUMPS — RUNNING' : 'PUMPS — STANDBY';
-        telPump.classList.toggle('is-run', d.pump > 0.5);
-        telValve.textContent = d.valve > 0.5 ? 'V-101 — OPEN' : 'V-101 — CLOSED';
-        telValve.classList.toggle('is-run', d.valve > 0.5);
-    });
-
     /* ---------- loader ---------- */
     var loader = document.getElementById('loader');
     var loaderBar = document.getElementById('loaderBar');
@@ -177,14 +195,16 @@
         if (loaderDone) return;
         loaderDone = true;
         loaderBar.style.width = '100%';
-        loaderText.textContent = 'Protection grid online';
+        loaderText.textContent = currentLanguage === 'fr' ? 'Système de protection opérationnel' : 'Protection grid online';
         setTimeout(function () { loader.classList.add('done'); }, 350);
     }
     window.addEventListener('safyron:ready', finishLoader);
     setTimeout(function () { if (!loaderDone) loaderBar.style.width = '72%'; }, 400);
 
     function showSceneError() {
-        loaderText.textContent = '3D scene unavailable. Check WebGL support and reload.';
+        loaderText.textContent = currentLanguage === 'fr'
+            ? 'Scène 3D indisponible. Vérifiez WebGL puis rechargez la page.'
+            : '3D scene unavailable. Check WebGL support and reload.';
         loaderBar.style.width = '100%';
         loaderBar.style.background = 'var(--danger-ink)';
     }
@@ -195,13 +215,35 @@
         }
     }, true);
 
-    /* ---------- newsletter ---------- */
-    var newsletterForm = document.getElementById('newsletterForm');
-    var newsletterNote = document.getElementById('newsletterNote');
-    if (newsletterForm) {
-        newsletterForm.addEventListener('submit', function (event) {
-            event.preventDefault();
-            newsletterNote.textContent = 'Demo captured. A backend or email tool can be connected later.';
-        });
+    /* ---------- booking preview ---------- */
+    var bookingDialog = document.getElementById('bookingDialog');
+    var bookingForm = document.getElementById('bookingForm');
+    var bookingDate = document.getElementById('bookingDate');
+    var bookingFeedback = document.getElementById('bookingFeedback');
+    var today = new Date();
+    if (bookingDate) {
+        bookingDate.min = [
+            today.getFullYear(),
+            String(today.getMonth() + 1).padStart(2, '0'),
+            String(today.getDate()).padStart(2, '0')
+        ].join('-');
     }
+    document.querySelectorAll('.booking-trigger').forEach(function (button) {
+        button.addEventListener('click', function () {
+            bookingFeedback.textContent = '';
+            bookingDialog.showModal();
+        });
+    });
+    document.querySelector('.booking-close').addEventListener('click', function () {
+        bookingDialog.close();
+    });
+    bookingDialog.addEventListener('click', function (event) {
+        if (event.target === bookingDialog) bookingDialog.close();
+    });
+    bookingForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        bookingFeedback.textContent = currentLanguage === 'fr'
+            ? 'Prévisualisation uniquement : votre sélection n’est pas envoyée et aucun rendez-vous n’est réservé.'
+            : 'Preview only: your selection is not submitted and no meeting has been booked.';
+    });
 })();

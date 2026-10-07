@@ -254,8 +254,6 @@ const state = {
     fire: 0, water: 0, steam: 0, alarm: 0, flow: 0.2,
     siren: 0, actIndex: -1, netStep: -1, ready: false, roll: 0,
 
-    /* 9-step dike-fire process chain */
-    step: 0,          // 0..8 current step index
     detect: 0,        // IR cameras on TK-001
     signal: 0,        // signal travelling camera -> FACP
     valveOpen: 0,     // V-101 fire-water deluge valve commanded open
@@ -266,9 +264,7 @@ const state = {
     pressure: DESIGN.P_STATIC,
     pumpStart: 0,     // fire pumps auto-started on low-pressure trip
     jockeyStart: 0,   // jockey pump starts when the camera reaches its unit
-    allclear: 0,
-    hudStep: -2,      // last step dispatched to the HUD
-    telAt: 0          // telemetry throttle timestamp
+    allclear: 0
 };
 
 /* ---------- small helpers ---------- */
@@ -1791,7 +1787,7 @@ function buildHandwheel(r, mat) {
 /* ==========================================================================
    PIPE-MOUNTED PRESSURE GAUGE — a real dial on an impulse leg, so the step-7
    pressure decay (10 -> 7 bar) is readable ON THE PIPEWORK itself and not only
-   in the HTML telemetry.
+   in the incident scene state.
 
    Sweep: 0 bar at -135 deg (lower-left) through 12 bar at 90 deg (top).
    This orientation makes the needle move visibly downward as pressure falls
@@ -3062,18 +3058,6 @@ function sampleRig(p) {
    ========================================================================== */
 const STEP_BOUNDS = [0, 0.07, 0.17, 0.30, 0.42, 0.55, 0.66, 0.785, 0.90, 1.0];
 const PUMP_HOUSE_ARRIVAL = [0.785, 0.795];
-const STEP_LABELS = [
-    'Ignition — pool fire in the TK-001 dike',
-    'Opposing infrared cameras detect the fire',
-    'Camera alarm signals reach Fire Alarm Panel FACP-01',
-    'Fire-water deluge valve V-101 opens',
-    'TK-001 roof sprinklers spray while foam fills its dike',
-    'TK-002 roof sprinklers start to cool the adjacent tank',
-    'Ring-main pressure falls to the 7 bar pump-start point',
-    'Fire pumps start and drive water through the discharge line',
-    'Fire is controlled; pumps and foam continue as the camera pulls wide'
-];
-
 function computeStates(p) {
     const r = chapterRanges || {};
     const net = r.network || { start: 0.12, end: 0.42 };
@@ -3109,11 +3093,6 @@ function computeStates(p) {
     const out = ss(T, B[8], B[8] + 0.05);
     state.fire *= (1 - out);
     state.fireOut = out;
-
-    /* current step index for the HUD list */
-    let si = -1;
-    for (let i = 0; i < 9; i++) if (T >= B[i]) si = i;
-    state.step = si;
 
     /* supervisory — the alarm exists only while the dike fire burns */
     state.flow = Math.max(0.22, ss(p, net.start, net.start + netW * 0.3));
@@ -3742,36 +3721,6 @@ function updateHud() {
         }
     }
 
-    /* ---------- 9-step process step ---------- */
-    if (state.step !== state.hudStep) {
-        state.hudStep = state.step;
-        window.dispatchEvent(new CustomEvent('safyron:step', {
-            detail: { index: state.step, label: STEP_LABELS[state.step] || '' }
-        }));
-    }
-
-    /* ---------- live telemetry, throttled to ~12 Hz ---------- */
-    const now = performance.now();
-    if (now - (state.telAt || 0) > 80) {
-        state.telAt = now;
-        const qFoam = DESIGN.qFoam * state.dikeFoam;
-        const qA = DESIGN.qCoolA * state.coolA;
-        const qB = DESIGN.qCoolB * state.coolB;
-        window.dispatchEvent(new CustomEvent('safyron:tel', {
-            detail: {
-                pressure: state.pressure,
-                foam: qFoam,
-                coolA: qA,
-                coolB: qB,
-                total: (qFoam + qA + qB) * 60 / 1000,
-                solution: DESIGN.solution * state.dikeFoam,
-                concentrate: DESIGN.concentrate * state.dikeFoam,
-                pump: state.pumpStart,
-                valve: state.valveOpen,
-                active: state.step >= 0
-            }
-        }));
-    }
 }
 
 function getScrollProgress() {

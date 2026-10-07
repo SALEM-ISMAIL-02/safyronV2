@@ -1,6 +1,6 @@
 // Screenshot harness, via CDP.
 // Scrolls the page to a given position within an act and captures a PNG,
-// reporting the telemetry readout for that scroll position.
+// reporting the active panel and scene state for that scroll position.
 //
 //   usage: node tools/shot.cjs <url> <outPng> <scrollFraction> <actName>
 //
@@ -121,17 +121,19 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     }
     const probe = await send('Runtime.evaluate', {
         expression: `(function(){
-            var g=function(id){var e=document.getElementById(id);return e?e.textContent:null;};
-            var act=document.querySelector('#seqList li.is-active');
             var doc=document.documentElement;
             var max=doc.scrollHeight-window.innerHeight;
+            var section=document.querySelector('[data-act="${act}"]');
+            var captions=section?Array.from(section.querySelectorAll('.caption')).map(function(el){
+              var r=el.getBoundingClientRect();
+              return {text:el.innerText.slice(0,240),x:Math.round(r.x),y:Math.round(r.y),
+                width:Math.round(r.width),height:Math.round(r.height)};
+            }):[];
             return JSON.stringify({body:document.body.className,
               y:Math.round(window.scrollY), max:Math.round(max),
               prog:+(window.scrollY/Math.max(1,max)).toFixed(3),
-              stepIdx: act?act.getAttribute('data-seq'):null,
-              done:document.querySelectorAll('#seqList li.is-done').length,
-              pressure:g('telPressure'),foam:g('telFoam'),coolA:g('telCoolA'),
-              coolB:g('telCoolB'),total:g('telTotal'),pump:g('telPump'),valve:g('telValve'),
+              act:"${act}",captions:captions,
+              overflowX:Math.max(doc.scrollWidth,document.body.scrollWidth)-window.innerWidth,
               vw:window.innerWidth,vh:window.innerHeight,
               cam:(window.__dbg&&__dbg.camera)?__dbg.camera.position.toArray().map(function(n){return Math.round(n*10)/10;}):null,
               sp:(window.__dbg&&__dbg.state)?+__dbg.state.p.toFixed(4):null,

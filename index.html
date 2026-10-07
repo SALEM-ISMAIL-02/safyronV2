@@ -18,9 +18,11 @@
                 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
                 if (!window.location.hash) window.scrollTo(0, 0);
                 var saved = localStorage.getItem('safyron-theme');
+                var savedLanguage = localStorage.getItem('safyron-language');
                 var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
                 var theme = saved || (prefersLight ? 'light' : 'dark');
                 document.documentElement.setAttribute('data-theme', theme);
+                document.documentElement.lang = savedLanguage === 'fr' ? 'fr' : 'en';
                 var meta = document.getElementById('themeColorMeta');
                 if (meta) meta.setAttribute('content', theme === 'light' ? '#eef2f8' : '#050b16');
             } catch (e) {
@@ -46,7 +48,7 @@
             <img class="theme-logo theme-logo-dark" src="darkSafyronLogo.png" alt="Safyron Engineering">
             <img class="theme-logo theme-logo-light" src="lightSafyronLogo.png" alt="Safyron Engineering">
             <div class="loader-bar"><span id="loaderBar"></span></div>
-            <p class="loader-text" id="loaderText">Initializing protection grid</p>
+            <p class="loader-text" id="loaderText" data-en="Initializing protection grid" data-fr="Initialisation du système de protection">Initializing protection grid</p>
         </div>
     </div>
     <header class="site-header" id="siteHeader">
@@ -57,6 +59,10 @@
             </a>
 
             <div class="header-controls">
+                <div class="language-toggle" role="group" aria-label="Choose language">
+                    <button type="button" data-language="en" aria-pressed="true">EN</button>
+                    <button type="button" data-language="fr" aria-pressed="false">FR</button>
+                </div>
                 <button
                     class="theme-toggle"
                     id="themeToggle"
@@ -92,23 +98,23 @@
             </div>
 
             <nav class="nav" id="mainNav" aria-label="Main navigation">
-                <a href="#act-network">Services</a>
-                <a href="#act-command">About</a>
-                <a href="#act-incident">Proof</a>
-                <a href="#act-resolution">Contact</a>
-                <a class="nav-cta" href="#act-resolution">Book a Discovery Call</a>
+                <a href="#act-network" data-en="Services" data-fr="Services">Services</a>
+                <a href="#footer-expertise" data-en="Expertise" data-fr="Expertise">Expertise</a>
+                <a href="#act-incident" data-en="Approach" data-fr="Méthode">Approach</a>
+                <a href="#act-resolution" data-en="Contact" data-fr="Contact">Contact</a>
+                <button class="nav-cta booking-trigger" type="button" data-en="Book a meeting" data-fr="Réserver une réunion">Book a meeting</button>
             </nav>
         </div>
     </header>
 
     <aside class="hud" aria-hidden="true">
         <div class="hud-rail" id="hudRail">
-            <span class="hud-dot" data-dot><i></i><em>Overview</em></span>
-            <span class="hud-dot" data-dot><i></i><em>Service Network</em></span>
-            <span class="hud-dot" data-dot><i></i><em>Command</em></span>
-            <span class="hud-dot" data-dot><i></i><em>Incident</em></span>
-            <span class="hud-dot" data-dot><i></i><em>Suppression</em></span>
-            <span class="hud-dot" data-dot><i></i><em>Resolution</em></span>
+            <span class="hud-dot" data-dot><i></i><em data-en="Overview" data-fr="Vue d’ensemble">Overview</em></span>
+            <span class="hud-dot" data-dot><i></i><em data-en="Service Network" data-fr="Réseau de services">Service Network</em></span>
+            <span class="hud-dot" data-dot><i></i><em data-en="Valve & foam" data-fr="Vannes & mousse">Valve & foam</em></span>
+            <span class="hud-dot" data-dot><i></i><em data-en="Tank response" data-fr="Protection des bacs">Tank response</em></span>
+            <span class="hud-dot" data-dot><i></i><em data-en="Fire pumps" data-fr="Pompes incendie">Fire pumps</em></span>
+            <span class="hud-dot" data-dot><i></i><em data-en="All clear" data-fr="Fin d'intervention">All clear</em></span>
         </div>
     </aside>
     <div class="hud-readout" aria-hidden="true">
@@ -119,37 +125,37 @@
     <main id="top">
         <section class="act act-hero" id="act-hero" data-act="hero">
             <div class="act-sticky">
-                <div class="caption caption-hero is-active">
-                    <span class="eyebrow">Process Safety for Critical Facilities</span>
-                    <h1>Engineering <span class="gradient">fire-safe industrial systems</span> in real time</h1>
-                    <p>Safyron Engineering shapes risk-driven protection for oil, gas and energy facilities. Follow a tank-fire response in 3D — from infrared detection and the alarm signal through deluge, foam and all-clear.</p>
+                <div class="caption caption-hero">
+                    <span class="eyebrow" data-en="Live fire-protection sequence" data-fr="Séquence de protection incendie en direct">Process Safety for Critical Facilities</span>
+                    <h1><span data-en="From fire " data-fr="Du feu "></span><span class="gradient" data-en="detection to suppression" data-fr="détecté à l'extinction"></span><span data-en=" — in real time" data-fr=" — en temps réel"></span></h1>
+                    <p data-en="Follow a TK-001 tank-fire response: opposing infrared cameras detect the fire, the alarm panel opens the deluge valve, and water and foam systems respond." data-fr="Suivez la réponse à un feu sur le bac TK-001 : les caméras infrarouges détectent l'incendie, la centrale ouvre la vanne déluge et les systèmes d'eau et de mousse interviennent.">Safyron Engineering shapes risk-driven protection for oil, gas and energy facilities. Follow a tank-fire response in 3D — from infrared detection and the alarm signal through deluge, foam and all-clear.</p>
                     <div class="hero-actions">
-                        <a class="btn-primary" href="#act-network">Explore Services</a>
-                        <a class="btn-secondary" href="#act-resolution">Book a Call</a>
+                        <a class="btn-primary" href="#act-network" data-en="Explore expertise" data-fr="Découvrir l'expertise">Explore Services</a>
+                        <button class="btn-secondary booking-trigger" type="button" data-en="Book a meeting" data-fr="Réserver une réunion">Book a Call</button>
                     </div>
                     <div class="hero-meta">
-                        <div class="meta-chip">Opposing infrared cameras</div>
-                        <div class="meta-chip">Alarm signal to deluge</div>
-                        <div class="meta-chip">Water and foam response</div>
+                        <div class="meta-chip" data-en="Opposing infrared cameras" data-fr="Caméras infrarouges opposées">Opposing infrared cameras</div>
+                        <div class="meta-chip" data-en="Alarm signal to deluge" data-fr="Du signal d'alarme au déluge">Alarm signal to deluge</div>
+                        <div class="meta-chip" data-en="Water and foam response" data-fr="Intervention par eau et mousse">Water and foam response</div>
                     </div>
                 </div>
-                <div class="scroll-hint" aria-hidden="true"><span class="scroll-hint-line"></span><span class="scroll-hint-text">Scroll to follow the response</span></div>
+                <div class="scroll-hint" aria-hidden="true"><span class="scroll-hint-line"></span><span class="scroll-hint-text" data-en="Scroll to follow the response" data-fr="Faites défiler pour suivre l'intervention">Scroll to follow the response</span></div>
             </div>
         </section>
 
         <section class="act act-network" id="act-network" data-act="network">
             <div class="act-sticky">
                 <header class="network-head caption">
-                    <span class="section-kicker">Service Line</span>
-                    <h2>Follow the line — every module is a station on this network</h2>
+                    <span class="section-kicker" data-en="Our expertise" data-fr="Nos expertises">Service Line</span>
+                    <h2 data-en="Detection, alarm and valve actuation" data-fr="Détection, alarme et commande des vannes">Follow the line — every module is a station on this network</h2>
                 </header>
                 <ol class="network-steps" id="networkSteps">
-                    <li class="step"><span class="step-index">Module 01</span><h3>Études de dangers</h3><p>Hazard studies that map every credible scenario on your facility before it can ever happen.</p></li>
-                    <li class="step"><span class="step-index">Module 02</span><h3>Analyses de risques industriels</h3><p>Industrial risk analysis ranking scenarios by likelihood and severity, so investment lands where exposure is highest.</p></li>
-                    <li class="step"><span class="step-index">Module 03</span><h3>Dimensionnement des systèmes incendie</h3><p>Fire protection sizing — water reserves, pump capacity and deluge networks computed line by line.</p></li>
-                    <li class="step"><span class="step-index">Module 04</span><h3>Notes de calcul</h3><p>Clean calculation notes your inspectors and insurers can follow, assumption by assumption.</p></li>
-                    <li class="step"><span class="step-index">Module 05</span><h3>Dossiers techniques</h3><p>Structured technical dossiers that turn engineering intent into approvable documentation.</p></li>
-                    <li class="step"><span class="step-index">Module 06</span><h3>Extension layer</h3><p>Reserved for HAZOP, ATEX and on-site follow-up modules as your asset grows.</p></li>
+                    <li class="step"><span class="step-index">Stage 01</span><h3 data-en="Infrared surveillance" data-fr="Surveillance infrarouge">Infrared surveillance</h3><p data-en="Two opposing cameras monitor the tank from both sides." data-fr="Deux caméras opposées surveillent le bac depuis ses deux côtés.">Two opposing cameras monitor the tank from both sides.</p></li>
+                    <li class="step"><span class="step-index">Stage 02</span><h3 data-en="Fire detected" data-fr="Incendie détecté">Fire detected</h3><p data-en="The front-facing infrared sensor identifies the flame at TK-001." data-fr="Le capteur infrarouge avant détecte la flamme sur TK-001.">The front-facing infrared sensor identifies the flame at TK-001.</p></li>
+                    <li class="step"><span class="step-index">Stage 03</span><h3 data-en="Alarm signal to FACP-01" data-fr="Signal d'alarme vers FACP-01">Alarm signal to FACP-01</h3><p data-en="The camera signal travels along the cable to the fire alarm control panel." data-fr="Le signal des caméras suit le câble jusqu'à la centrale de détection incendie.">The camera signal travels along the cable to the fire alarm control panel.</p></li>
+                    <li class="step"><span class="step-index">Stage 04</span><h3 data-en="V-102 actuates" data-fr="V-102 s'actionne">V-102 actuates</h3><p data-en="The panel commands the deluge sequence; the valve beside the panel opens first." data-fr="La centrale commande la séquence déluge ; la vanne près du panneau s'ouvre d'abord.">The panel commands the deluge sequence; the valve beside the panel opens first.</p></li>
+                    <li class="step"><span class="step-index">Stage 05</span><h3 data-en="V-101 opens" data-fr="V-101 s'ouvre">V-101 opens</h3><p data-en="The second deluge valve opens to supply the tank protection system." data-fr="La seconde vanne déluge s'ouvre pour alimenter la protection du bac.">The second deluge valve opens to supply the tank protection system.</p></li>
+                    <li class="step"><span class="step-index">Stage 06</span><h3 data-en="Water and foam ready" data-fr="Eau et mousse prêtes">Water and foam ready</h3><p data-en="The overhead sprinkler and low-level foam systems are enabled at TK-001." data-fr="Les sprinkleurs de toiture et les sorties basses de mousse sont activés sur TK-001.">The overhead sprinkler and low-level foam systems are enabled at TK-001.</p></li>
                 </ol>
                 <div class="network-progress" aria-hidden="true"><span id="networkProgressBar"></span></div>
             </div>
@@ -158,14 +164,12 @@
         <section class="act act-command" id="act-command" data-act="command">
             <div class="act-sticky">
                 <div class="caption caption-command">
-                    <span class="section-kicker">Command Layer</span>
-                    <h2>A sharp industrial identity built around reliability, rigor and controlled response</h2>
-                    <p>Safyron Engineering designs the nervous system of industrial protection: detection grids, pump logic and deluge orchestration, engineered as one coherent whole.</p>
-                    <div class="about-meta">
-                        <div><span>CEO</span><strong>Ashref AMMAR</strong></div>
-                        <div><span>Role</span><strong>Process Safety Expert</strong></div>
-                        <div><span>Languages</span><strong>EN / FR / AR</strong></div>
-                        <div><span>Positioning</span><strong>Oil, energy, industrial assets</strong></div>
+                    <span class="section-kicker" data-en="Deluge sequence" data-fr="Séquence déluge">Deluge sequence</span>
+                    <h2 data-en="Water + foam at TK-001" data-fr="Eau + mousse sur TK-001">The valves open. Water and foam reach TK-001.</h2>
+                    <p data-en="V-102 then V-101 open. Roof sprays cool the tank as low outlets discharge foam into its dike." data-fr="V-102 puis V-101 s'ouvrent. Les sprinkleurs refroidissent le bac et la mousse remplit la rétention par les sorties basses.">V-102 then V-101 open. Roof sprays cool the tank as low outlets discharge foam into its dike.</p>
+                    <div class="response-record response-record-compact">
+                        <div class="metric"><strong>V-102 → V-101</strong><span data-en="Deluge valves actuate in order" data-fr="Les vannes déluge s'actionnent dans l'ordre">Deluge valves actuate in order</span></div>
+                        <div class="metric"><strong>TK-001</strong><span data-en="Roof spray + dike foam" data-fr="Sprinkleurs toiture + mousse en rétention">Roof spray + dike foam</span></div>
                     </div>
                 </div>
             </div>
@@ -173,37 +177,38 @@
         <section class="act act-incident" id="act-incident" data-act="incident">
             <div class="act-sticky">
                 <div class="caption caption-incident">
-                    <span class="section-kicker alert-kicker">Alarm State</span>
-                    <h2>When prevention ends, response begins</h2>
-                    <p>A pool fire has taken hold in the TK-001 dike. Every module on the network is already in position — this is the moment the design proves itself.</p>
-                    <div class="response-record">
-                        <div class="metric"><strong>09</strong><span>Causal steps from ignition to extinguishment — nothing acts before its cause</span></div>
-                        <div class="metric"><strong>4.1 L/min/m²</strong><span>Dike foam application rate, fixed low-level outlets (NFPA 11 §5.7)</span></div>
-                        <div class="metric"><strong>55 min</strong><span>Foam discharge time maintained after the fire is out (NFPA 11)</span></div>
+                    <span class="section-kicker alert-kicker" data-en="Tank cooling" data-fr="Refroidissement des bacs">Alarm State</span>
+                    <h2 data-en="Water protects both tanks as ring pressure falls" data-fr="L'eau protège les deux bacs tandis que la pression baisse">Water protects both tanks as ring pressure falls</h2>
+                    <p data-en="TK-001 receives roof spray and dike foam. TK-002 is cooled to protect the adjacent tank as ring pressure falls toward 7 bar." data-fr="TK-001 reçoit l'eau des sprinkleurs et la mousse en rétention. TK-002 est refroidi pendant que la pression du réseau baisse vers 7 bar.">TK-001 receives roof spray and dike foam. TK-002 is cooled to protect the adjacent tank as ring pressure falls toward 7 bar.</p>
+                    <div class="response-record response-record-compact">
+                        <div class="metric"><strong>TK-001 + TK-002</strong><span data-en="Simultaneous cooling; foam covers the TK-001 dike" data-fr="Refroidissement simultané ; la mousse couvre la rétention de TK-001">Simultaneous cooling; foam covers the TK-001 dike</span></div>
+                        <div class="metric"><strong>4.1 L/min/m²</strong><span data-en="Dike foam application rate · NFPA 11 §5.7" data-fr="Taux d'application de mousse · NFPA 11 §5.7">Dike foam application rate · NFPA 11 §5.7</span></div>
                     </div>
                 </div>
             </div>
         </section>
 
         <section class="act act-suppression" id="act-suppression" data-act="suppression">
-            <div class="act-sticky" aria-hidden="true"></div>
+            <div class="act-sticky">
+                <div class="caption caption-suppression">
+                    <span class="section-kicker calm-kicker" data-en="Fire-water pump house" data-fr="Local des pompes incendie">Fire-water pump house</span>
+                    <h2 data-en="The pump set starts at 7 bar" data-fr="Le groupe de pompage démarre à 7 bar">The pump set starts at 7 bar</h2>
+                    <p data-en="At the 7 bar trip point, the jockey and duty fire pumps start at the skid. The discharge header feeds the fire-water ring." data-fr="Au seuil de 7 bar, les pompes jockey et incendie démarrent au skid. Le collecteur de refoulement alimente le réseau incendie.">At the 7 bar trip point, the jockey and duty fire pumps start at the skid. The discharge header feeds the fire-water ring.</p>
+                    <div class="response-record response-record-compact">
+                        <div class="metric"><strong>7 bar</strong><span data-en="Pressure switch start point" data-fr="Seuil du pressostat de démarrage">Pressure switch start point</span></div>
+                        <div class="metric"><strong data-en="Jockey + duty" data-fr="Jockey + pompe principale">Jockey + duty</strong><span data-en="Pumps running into the fire-water ring" data-fr="Pompes en service vers le réseau incendie">Pumps running into the fire-water ring</span></div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section class="act act-resolution" id="act-resolution" data-act="resolution">
             <div class="act-sticky">
                 <div class="caption caption-resolution">
-                    <span class="section-kicker">Call To Action</span>
-                    <h2>Build the next layer of industrial safety with Safyron</h2>
-                    <div class="contact-stack">
-                        <div class="contact-chip"><strong>Phone</strong><span>+216 58 405 906</span></div>
-                        <div class="contact-chip"><strong>Email</strong><a href="mailto:ashref.ammar@gmail.com">ashref.ammar@gmail.com</a></div>
-                        <div class="contact-chip"><strong>LinkedIn</strong><a href="https://www.linkedin.com/in/ashraf-ammar-tn/" target="_blank" rel="noreferrer">Ashraf AMMAR</a></div>
-                    </div>
-                    <form class="newsletter-form" id="newsletterForm">
-                        <input type="email" id="newsletterEmail" placeholder="Enter your professional email" aria-label="Email address">
-                        <button type="submit">Request Updates</button>
-                    </form>
-                    <div class="newsletter-note" id="newsletterNote">No backend connected yet. This is a polished front-end placeholder.</div>
+                    <span class="section-kicker" data-en="All clear" data-fr="Fin d'intervention">Call To Action</span>
+                    <h2 data-en="Fire controlled. Full system in view." data-fr="Feu maîtrisé. Vue d'ensemble du système.">Fire controlled. Full system in view.</h2>
+                    <p data-en="The camera pulls back to reveal the installation; pumps and foam remain in operation for the required discharge period." data-fr="La caméra prend du recul pour montrer l'installation ; les pompes et la mousse restent en service pendant la durée de déversement requise.">The camera pulls back to reveal the installation; pumps and foam remain in operation for the required discharge period.</p>
+                    <button class="btn-primary booking-trigger" type="button" data-en="Choose a meeting time" data-fr="Choisir un créneau de réunion">Choose a meeting time</button>
                 </div>
             </div>
         </section>
@@ -215,16 +220,55 @@
                     <img class="theme-logo theme-logo-dark" src="darkSafyronLogo.png" alt="Safyron Engineering">
                     <img class="theme-logo theme-logo-light" src="lightSafyronLogo.png" alt="Safyron Engineering">
                 </a>
-                <p>Real-time 3D concept website for process safety, industrial risk studies, and fire protection design.</p>
+                <p data-en="3D experience for process safety, industrial risk studies and fire-protection design." data-fr="Expérience 3D dédiée à la sécurité des procédés, aux études de risques industriels et à la conception de systèmes incendie.">Real-time 3D concept website for process safety, industrial risk studies, and fire protection design.</p>
+            </div>
+            <div class="footer-profile" id="footer-expertise">
+                <div class="team-profile">
+                    <span class="team-avatar" aria-hidden="true">AA</span>
+                    <span class="team-details">
+                        <span data-en="Founder · Process Safety Expert" data-fr="Fondateur · Expert en sécurité des procédés">Founder · Process Safety Expert</span>
+                        <strong>Ashraf AMMAR</strong>
+                        <span data-en="Oil · gas · energy" data-fr="Pétrole · gaz · énergie">Oil · gas · energy</span>
+                    </span>
+                </div>
+                <div class="expertise-tags" aria-label="Codes and methods">
+                    <span>NFPA</span><span>API</span><span>HAZOP</span><span>ATEX</span>
+                </div>
+                <p class="footer-credentials-note" data-en="Specific certifications and accreditations to be confirmed." data-fr="Certifications et accréditations spécifiques à confirmer.">Specific certifications and accreditations to be confirmed.</p>
+                <div class="footer-contact">
+                    <a href="tel:+21658405906">+216 58 405 906</a>
+                    <a href="mailto:ashref.ammar@gmail.com">ashref.ammar@gmail.com</a>
+                    <a href="https://www.linkedin.com/in/ashraf-ammar-tn/" target="_blank" rel="noreferrer">LinkedIn</a>
+                </div>
             </div>
             <div class="footer-links">
-                <a href="#act-network">Services</a>
-                <a href="#act-command">About</a>
-                <a href="#act-incident">Proof</a>
-                <a href="#act-resolution">Contact</a>
+                <a href="#act-network" data-en="Services" data-fr="Services">Services</a>
+                <a href="#footer-expertise" data-en="Expertise" data-fr="Expertise">About</a>
+                <a href="#act-incident" data-en="Approach" data-fr="Méthode">Proof</a>
+                <a href="#act-resolution" data-en="Contact" data-fr="Contact">Contact</a>
             </div>
         </div>
     </footer>
+
+    <dialog class="booking-dialog" id="bookingDialog" aria-labelledby="bookingTitle">
+        <form class="booking-panel" id="bookingForm">
+            <button class="booking-close" type="button" aria-label="Close booking dialog" data-en-label="Close booking dialog" data-fr-label="Fermer la fenêtre de réservation">&times;</button>
+            <span class="section-kicker" data-en="Discovery meeting" data-fr="Réunion découverte">Discovery meeting</span>
+            <h2 id="bookingTitle" data-en="Find a time to talk" data-fr="Choisissez un moment pour échanger">Find a time to talk</h2>
+            <p class="booking-intro" data-en="Choose a preferred date and time. Live availability will appear here once the calendar is connected." data-fr="Indiquez vos préférences de date et d'heure. Les disponibilités en direct apparaîtront ici après la connexion du calendrier.">Choose a preferred date and time. Live availability will appear here once the calendar is connected.</p>
+            <label for="bookingDate" data-en="Preferred date" data-fr="Date souhaitée">Preferred date</label>
+            <input type="date" id="bookingDate" required>
+            <label for="bookingTime" data-en="Preferred time (Tunis time)" data-fr="Heure souhaitée (heure de Tunis)">Preferred time (Tunis time)</label>
+            <select id="bookingTime" required>
+                <option value="" data-en="Choose a time" data-fr="Choisir une heure">Choose a time</option>
+                <option value="morning" data-en="Morning · 09:00–12:00" data-fr="Matin · 09:00–12:00">Morning · 09:00–12:00</option>
+                <option value="afternoon" data-en="Afternoon · 13:00–17:00" data-fr="Après-midi · 13:00–17:00">Afternoon · 13:00–17:00</option>
+            </select>
+            <p class="booking-disclaimer" data-en="Preview only: this selection is not submitted and no meeting is booked. Live availability requires a scheduling-calendar connection." data-fr="Prévisualisation uniquement : cette sélection n'est pas envoyée et aucun rendez-vous n'est réservé. Les disponibilités en direct nécessitent la connexion d'un calendrier.">Preview only: this selection is not submitted and no meeting is booked. Live availability requires a scheduling-calendar connection.</p>
+            <button class="btn-primary booking-submit" type="submit" data-en="Preview selection" data-fr="Prévisualiser le créneau">Preview selection</button>
+            <p class="booking-feedback" id="bookingFeedback" role="status" aria-live="polite"></p>
+        </form>
+    </dialog>
 
     <script src="script.js" defer></script>
     <script type="module" src="scene3d.js"></script>
