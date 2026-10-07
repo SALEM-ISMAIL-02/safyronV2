@@ -7,6 +7,59 @@
     var navToggle = document.querySelector('.nav-toggle');
     var navLinks = document.querySelectorAll('.nav a');
 
+    /* ---------- theme (dark / light) ----------
+       The <html data-theme> attribute is the single source of truth; CSS does all
+       the work. This block only flips the attribute, persists the choice, and
+       notifies the 3D scene (which owns its own palette) via a CustomEvent. */
+    var THEME_KEY = 'safyron-theme';
+    var root = document.documentElement;
+    var themeToggle = document.getElementById('themeToggle');
+    var systemLight = window.matchMedia('(prefers-color-scheme: light)');
+
+    function currentTheme() {
+        return root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+    }
+
+    function syncToggle(theme) {
+        if (!themeToggle) return;
+        var toLight = theme === 'dark';
+        themeToggle.setAttribute('aria-pressed', String(theme === 'light'));
+        var label = toLight ? 'Switch to light mode' : 'Switch to dark mode';
+        themeToggle.setAttribute('aria-label', label);
+        themeToggle.setAttribute('title', label);
+    }
+
+    function applyTheme(theme, persist) {
+        root.setAttribute('data-theme', theme);
+        syncToggle(theme);
+        var meta = document.getElementById('themeColorMeta');
+        if (meta) meta.setAttribute('content', theme === 'light' ? '#eef2f8' : '#050b16');
+        if (persist) {
+            try { localStorage.setItem(THEME_KEY, theme); } catch (e) { /* private mode */ }
+        }
+        // the 3D canvas keeps its own colour pipeline and listens for this
+        window.dispatchEvent(new CustomEvent('safyron:theme', { detail: { theme: theme } }));
+    }
+
+    // the inline <head> script already set the attribute before first paint —
+    // just bring the button's label in line with it
+    syncToggle(currentTheme());
+
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function () {
+            applyTheme(currentTheme() === 'light' ? 'dark' : 'light', true);
+        });
+    }
+
+    // follow the OS only while the visitor hasn't made an explicit choice
+    var onSystemChange = function (e) {
+        var saved = null;
+        try { saved = localStorage.getItem(THEME_KEY); } catch (err) { /* ignore */ }
+        if (!saved) applyTheme(e.matches ? 'light' : 'dark', false);
+    };
+    if (systemLight.addEventListener) systemLight.addEventListener('change', onSystemChange);
+    else if (systemLight.addListener) systemLight.addListener(onSystemChange);
+
     /* ---------- mobile nav ---------- */
     function setMobileNavState(isOpen) {
         siteHeader.classList.toggle('nav-open', isOpen);
@@ -70,6 +123,51 @@
     });
     if (steps.length) { currentStep = 0; steps[0].classList.add('is-active'); }
 
+    /* ---------- 9-step dike-fire sequence + live telemetry ---------- */
+    var seqItems = document.querySelectorAll('#seqList li');
+    window.addEventListener('safyron:step', function (e) {
+        var i = e.detail.index;
+        seqItems.forEach(function (li, k) {
+            li.classList.toggle('is-active', k === i);
+            li.classList.toggle('is-done', k < i);
+        });
+    });
+
+    var telPressure = document.getElementById('telPressure');
+    var telPressureBar = document.getElementById('telPressureBar');
+    var telFoam = document.getElementById('telFoam');
+    var telCoolA = document.getElementById('telCoolA');
+    var telCoolB = document.getElementById('telCoolB');
+    var telTotal = document.getElementById('telTotal');
+    var telSolution = document.getElementById('telSolution');
+    var telConc = document.getElementById('telConc');
+    var telPump = document.getElementById('telPump');
+    var telValve = document.getElementById('telValve');
+    var telemetry = document.getElementById('telemetry');
+
+    function fmt(v, d) { return v.toFixed(d === undefined ? 0 : d); }
+
+    window.addEventListener('safyron:tel', function (e) {
+        var d = e.detail;
+        if (!telPressure) return;
+        telemetry.classList.toggle('is-live', d.active);
+        telPressure.textContent = fmt(d.pressure, 1) + ' bar';
+        // bar fills against the 10 bar static, 7 bar trip marked on the scale
+        telPressureBar.style.width = Math.max(0, Math.min(100, (d.pressure / 10) * 100)) + '%';
+        telPressureBar.classList.toggle('is-low', d.pressure < 7.6);
+        telFoam.textContent = fmt(d.foam) + ' L/min';
+        telCoolA.textContent = fmt(d.coolA) + ' L/min';
+        telCoolB.textContent = fmt(d.coolB) + ' L/min';
+        telTotal.textContent = fmt(d.total, 1) + ' m³/h';
+        telSolution.textContent = fmt(d.solution / 1000, 1) + ' m³';
+        telConc.textContent = fmt(d.concentrate) + ' L';
+
+        telPump.textContent = d.pump > 0.5 ? 'PUMPS — RUNNING' : 'PUMPS — STANDBY';
+        telPump.classList.toggle('is-run', d.pump > 0.5);
+        telValve.textContent = d.valve > 0.5 ? 'V-101 — OPEN' : 'V-101 — CLOSED';
+        telValve.classList.toggle('is-run', d.valve > 0.5);
+    });
+
     /* ---------- loader ---------- */
     var loader = document.getElementById('loader');
     var loaderBar = document.getElementById('loaderBar');
@@ -85,42 +183,17 @@
     window.addEventListener('safyron:ready', finishLoader);
     setTimeout(function () { if (!loaderDone) loaderBar.style.width = '72%'; }, 400);
 
-    /* ---------- 2D fallback (no WebGL / module failure / context loss) ---------- */
-    var legacyRunning = false;
-    function enableLegacy() {
-        if (legacyRunning) return;
-        legacyRunning = true;
-        finishLoader();
-        body.classList.add('no-webgl');
-        startLegacyPipeline();
+    function showSceneError() {
+        loaderText.textContent = '3D scene unavailable. Check WebGL support and reload.';
+        loaderBar.style.width = '100%';
+        loaderBar.style.background = 'var(--danger-ink)';
     }
-    window.addEventListener('safyron:error', enableLegacy);
-    setTimeout(function () { if (!loaderDone) enableLegacy(); }, 9000);
-
-    function startLegacyPipeline() {
-        var flowPath = document.getElementById('pipeFlow');
-        var pipelineNodes = document.querySelectorAll('.pipeline-node');
-        var fireScene = document.getElementById('fireScene');
-        var sprinklerHead = document.getElementById('sprinklerHead');
-        if (!flowPath) return;
-        var length = flowPath.getTotalLength();
-        flowPath.style.strokeDasharray = '0 ' + length;
-
-        function updateScrollFlow() {
-            var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-            var progress = maxScroll > 0 ? window.scrollY / maxScroll : 0;
-            flowPath.style.strokeDasharray = (Math.max(8, length * progress)) + ' ' + length;
-            pipelineNodes.forEach(function (node, index) {
-                var trigger = (index + 1) / (pipelineNodes.length + 1);
-                node.classList.toggle('live', progress >= trigger);
-            });
-            sprinklerHead.classList.toggle('active', progress >= 0.97);
-            fireScene.classList.toggle('extinguished', progress >= 0.97);
+    window.addEventListener('safyron:error', showSceneError);
+    document.addEventListener('error', function (event) {
+        if (event.target instanceof HTMLScriptElement && event.target.type === 'module') {
+            showSceneError();
         }
-        updateScrollFlow();
-        window.addEventListener('scroll', updateScrollFlow, { passive: true });
-        window.addEventListener('resize', updateScrollFlow);
-    }
+    }, true);
 
     /* ---------- newsletter ---------- */
     var newsletterForm = document.getElementById('newsletterForm');
@@ -132,5 +205,3 @@
         });
     }
 })();
-
-

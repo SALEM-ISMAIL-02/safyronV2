@@ -2,3 +2,19 @@
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Verification output (regenerate with tools/shot.cjs)
+shot_*.png
+shot_*.jpg
+
+# Headless browser profile used for CDP runs
+_edgeprof/
+
+# Local dependencies and scratch verification output
+node_modules/
+tmp/
+out.png
+
+# Editor / OS temp
+*.tmp
+*~

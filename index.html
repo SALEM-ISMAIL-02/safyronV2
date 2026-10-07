@@ -5,10 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Safyron Engineering | Process Safety & Fire Protection</title>
     <meta name="description" content="Safyron Engineering delivers industrial risk analysis, hazard studies, and fire protection design for complex energy facilities — rendered as a real-time 3D experience.">
+    <meta name="theme-color" content="#050b16" id="themeColorMeta">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
+    <!-- Apply the saved theme before first paint so there is no flash of the
+         wrong background while styles.css and scene3d.js are still loading. -->
+    <script>
+        (function () {
+            try {
+                if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+                if (!window.location.hash) window.scrollTo(0, 0);
+                var saved = localStorage.getItem('safyron-theme');
+                var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+                var theme = saved || (prefersLight ? 'light' : 'dark');
+                document.documentElement.setAttribute('data-theme', theme);
+                var meta = document.getElementById('themeColorMeta');
+                if (meta) meta.setAttribute('content', theme === 'light' ? '#eef2f8' : '#050b16');
+            } catch (e) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
     <script type="importmap">
     {
         "imports": {
@@ -35,19 +54,40 @@
                 <img src="logo.png" alt="Safyron Engineering logo">
             </a>
 
-            <button
-                class="nav-toggle"
-                type="button"
-                aria-expanded="false"
-                aria-controls="mainNav"
-                aria-label="Open navigation menu"
-            >
-                <span class="nav-toggle-box" aria-hidden="true">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </span>
-            </button>
+            <div class="header-controls">
+                <button
+                    class="theme-toggle"
+                    id="themeToggle"
+                    type="button"
+                    aria-pressed="false"
+                    aria-label="Switch to light mode"
+                    title="Switch to light mode"
+                >
+                    <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <circle cx="12" cy="12" r="4.4" fill="currentColor" />
+                        <g stroke="currentColor" stroke-width="1.9" stroke-linecap="round">
+                            <path d="M12 2.4v2.6M12 19v2.6M2.4 12H5M19 12h2.6M5.2 5.2 7 7M17 17l1.8 1.8M18.8 5.2 17 7M7 17l-1.8 1.8" />
+                        </g>
+                    </svg>
+                    <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M20.2 14.6A8.6 8.6 0 0 1 9.4 3.8a8.6 8.6 0 1 0 10.8 10.8Z" fill="currentColor" />
+                    </svg>
+                </button>
+
+                <button
+                    class="nav-toggle"
+                    type="button"
+                    aria-expanded="false"
+                    aria-controls="mainNav"
+                    aria-label="Open navigation menu"
+                >
+                    <span class="nav-toggle-box" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </button>
+            </div>
 
             <nav class="nav" id="mainNav" aria-label="Main navigation">
                 <a href="#act-network">Services</a>
@@ -80,18 +120,18 @@
                 <div class="caption caption-hero is-active">
                     <span class="eyebrow">Process Safety for Critical Facilities</span>
                     <h1>Engineering <span class="gradient">fire-safe industrial systems</span> in real time</h1>
-                    <p>Safyron Engineering shapes risk-driven protection for oil, gas and energy facilities. Scroll to run the line — from water reserve to deluge — and watch a full suppression sequence unfold in 3D.</p>
+                    <p>Safyron Engineering shapes risk-driven protection for oil, gas and energy facilities. Follow a tank-fire response in 3D — from infrared detection and the alarm signal through deluge, foam and all-clear.</p>
                     <div class="hero-actions">
                         <a class="btn-primary" href="#act-network">Explore Services</a>
                         <a class="btn-secondary" href="#act-resolution">Book a Call</a>
                     </div>
                     <div class="hero-meta">
-                        <div class="meta-chip">Water reserve to pump line</div>
-                        <div class="meta-chip">Detection to deluge valve</div>
-                        <div class="meta-chip">Engineered dossiers</div>
+                        <div class="meta-chip">Opposing infrared cameras</div>
+                        <div class="meta-chip">Alarm signal to deluge</div>
+                        <div class="meta-chip">Water and foam response</div>
                     </div>
                 </div>
-                <div class="scroll-hint" aria-hidden="true"><span class="scroll-hint-line"></span><span class="scroll-hint-text">Scroll to run the line</span></div>
+                <div class="scroll-hint" aria-hidden="true"><span class="scroll-hint-line"></span><span class="scroll-hint-text">Scroll to follow the response</span></div>
             </div>
         </section>
 
@@ -133,29 +173,18 @@
                 <div class="caption caption-incident">
                     <span class="section-kicker alert-kicker">Alarm State</span>
                     <h2>When prevention ends, response begins</h2>
-                    <p>A pool fire ignites at the tank bund. Every module on the network is already in position — this is the moment the design proves itself.</p>
+                    <p>A pool fire has taken hold in the TK-001 dike. Every module on the network is already in position — this is the moment the design proves itself.</p>
                     <div class="response-record">
-                        <div class="metric"><strong>15:00</strong><span>Detection-to-deluge sequence demonstrated on this page</span></div>
-                        <div class="metric"><strong>06</strong><span>Modules running on one integrated protection network</span></div>
-                        <div class="metric"><strong>24/7</strong><span>Command coverage designed for critical facilities</span></div>
+                        <div class="metric"><strong>09</strong><span>Causal steps from ignition to extinguishment — nothing acts before its cause</span></div>
+                        <div class="metric"><strong>4.1 L/min/m²</strong><span>Dike foam application rate, fixed low-level outlets (NFPA 11 §5.7)</span></div>
+                        <div class="metric"><strong>55 min</strong><span>Foam discharge time maintained after the fire is out (NFPA 11)</span></div>
                     </div>
                 </div>
             </div>
         </section>
 
         <section class="act act-suppression" id="act-suppression" data-act="suppression">
-            <div class="act-sticky">
-                <div class="caption caption-suppression">
-                    <span class="section-kicker calm-kicker">Deluge Sequence</span>
-                    <h2>Water finds the fire</h2>
-                    <ul class="seq-list">
-                        <li data-seq="0"><span class="seq-dot"></span>Monitor array — OPEN</li>
-                        <li data-seq="1"><span class="seq-dot"></span>Foam blanket — FORMING</li>
-                        <li data-seq="2"><span class="seq-dot"></span>Asset — PROTECTED</li>
-                    </ul>
-                    <p class="seq-note">Keep scrolling: the fire dies exactly when the design says it should.</p>
-                </div>
-            </div>
+            <div class="act-sticky" aria-hidden="true"></div>
         </section>
 
         <section class="act act-resolution" id="act-resolution" data-act="resolution">
@@ -191,46 +220,6 @@
             </div>
         </div>
     </footer>
-
-    <!-- 2D fallback experience: displayed only when WebGL is unavailable (body.no-webgl) -->
-    <aside class="legacy-2d" aria-hidden="true">
-        <svg class="pipeline-svg" viewBox="0 0 200 900" fill="none">
-            <defs>
-                <linearGradient id="pipeFlowGradient" x1="38" y1="0" x2="152" y2="900" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stop-color="#d8f4ff"></stop>
-                    <stop offset="40%" stop-color="#7ccfff"></stop>
-                    <stop offset="75%" stop-color="#4faeff"></stop>
-                    <stop offset="100%" stop-color="#1f76d2"></stop>
-                </linearGradient>
-            </defs>
-            <path class="pipe-outline" d="M102 18 C154 58, 154 128, 112 178 C76 220, 74 270, 120 320 C160 366, 164 430, 110 490 C76 530, 74 598, 124 650 C164 692, 164 770, 108 848"></path>
-            <path class="pipe-core" d="M102 18 C154 58, 154 128, 112 178 C76 220, 74 270, 120 320 C160 366, 164 430, 110 490 C76 530, 74 598, 124 650 C164 692, 164 770, 108 848"></path>
-            <path id="pipeFlow" class="pipe-flow" d="M102 18 C154 58, 154 128, 112 178 C76 220, 74 270, 120 320 C160 366, 164 430, 110 490 C76 530, 74 598, 124 650 C164 692, 164 770, 108 848"></path>
-            <circle class="pipeline-node" cx="112" cy="178" r="14"></circle>
-            <circle class="pipeline-node" cx="120" cy="320" r="14"></circle>
-            <circle class="pipeline-node" cx="110" cy="490" r="14"></circle>
-            <circle class="pipeline-node" cx="124" cy="650" r="14"></circle>
-            <text class="pipeline-text" x="16" y="172">Reserve</text>
-            <text class="pipeline-text" x="22" y="314">Pumps</text>
-            <text class="pipeline-text" x="10" y="484">Detection</text>
-            <text class="pipeline-text" x="18" y="644">Deluge</text>
-            <text class="pipeline-text" x="26" y="842">Asset</text>
-        </svg>
-        <div class="sprinkler-zone">
-            <div class="sprinkler-head" id="sprinklerHead">
-                <div class="spray"></div>
-            </div>
-            <div class="fire-scene" id="fireScene">
-                <div class="flame flame-a"></div>
-                <div class="flame flame-b"></div>
-                <div class="flame flame-c"></div>
-                <div class="fire-base"></div>
-                <div class="steam steam-a"></div>
-                <div class="steam steam-b"></div>
-                <div class="steam steam-c"></div>
-            </div>
-        </div>
-    </aside>
 
     <script src="script.js" defer></script>
     <script type="module" src="scene3d.js"></script>

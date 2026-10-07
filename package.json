@@ -1,0 +1,11 @@
+{
+  "name": "safyron",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "Safyron Engineering - scroll-driven 3D tank-farm scrollytelling (three.js).",
+  "scripts": {
+    "start": "node tools/serve.cjs",
+    "verify": "node tools/verify-tanks.cjs http://127.0.0.1:8731/ out.png incident 0.3"
+  }
+}
