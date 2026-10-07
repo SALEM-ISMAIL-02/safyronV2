@@ -1001,6 +1001,11 @@ h1, h2, h3 { font-family: "Oxanium", sans-serif; }
     -webkit-backdrop-filter: blur(10px);
 }
 .footer-inner { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; }
+.footer-brand { display: inline-flex; align-items: center; }
+.footer-brand img { width: 170px; max-height: 56px; object-fit: contain; }
+.footer-brand .theme-logo-light { display: none; }
+[data-theme="light"] .footer-brand .theme-logo-dark { display: none; }
+[data-theme="light"] .footer-brand .theme-logo-light { display: block; }
 .footer-copy strong { font-family: "Oxanium", sans-serif; letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.95rem; }
 .footer-copy p + p { margin-top: 6px; color: var(--text-soft); font-size: 0.86rem; max-width: 56ch; }
 .footer-links { display: flex; gap: 22px; align-items: center; }
